@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1\Webhook;
 
+use Illuminate\Support\Facades\Redis;
 use App\Enums\SlotWebhookResponseCode;
 use App\Enums\TransactionName;
 use App\Http\Controllers\Api\V1\Webhook\Traits\UseWebhook;

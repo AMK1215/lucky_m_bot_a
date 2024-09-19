@@ -11,13 +11,23 @@ crontab -e
 
 php artisan make:migration add_agent_link_to_users_table --table=users
 
-// to add column 
+
+redis db setup
+php artisan config:cache
+
+
+// to add column
 ALTER TABLE transactions
 ADD COLUMN agent_id INT(11) AFTER name;
 
 
 sudo chmod -R 775 /var/www/html/bossi_a/storage/logs/
 sudo chown -R www-data:www-data /var/www/html/bossi_a/storage/logs
+
+sudo chown -R www-data:www-data /var/www/lucky_m_bot_a/storage
+sudo chown -R www-data:www-data /var/www/lucky_m_bot_a/bootstrap/cache
+sudo chmod -R 775 /var/www/lucky_m_bot_a/storage
+sudo chmod -R 775 /var/www/lucky_m_bot_a/bootstrap/cache
 
 
 bossi ပြင်ရန် lists
@@ -29,7 +39,7 @@ bossi ပြင်ရန် lists
 5.balance တွေအကုန်လုံးကို 0သုံလုံးတစ်ဖြတ် "," ဖြတ်ပေးပါ။
 6.siteတစ်ခုလုံးရှိ  Deposit / Withdraw balance များကို Depositဆို အစိမ်းရောင် withdraw ဆိုအနီရောင်ဖြင့်ပြပေးရန်။
 7.balance ကို  header တွင်ထပ်ထည့်ရန်။ ဘယ် pageရောက်ရောက်headerတွင်balanceကိုကြည့်လိုရရန်။
-8.agentများရဲ့ ReferralCode ကို admin ကိုယ်တိုင်သတ်မှတ်ပေးလိုရရန်။ 
+8.agentများရဲ့ ReferralCode ကို admin ကိုယ်တိုင်သတ်မှတ်ပေးလိုရရန်။
 # Set the ownership of the entire project directory to www-data user and group
 chown -R www-data:www-data /var/www/html/bossi_a
 
