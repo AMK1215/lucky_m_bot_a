@@ -16,6 +16,7 @@ use App\Services\Slot\SlotWebhookService;
 use App\Services\Slot\SlotWebhookValidator;
 use App\Services\WalletService;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class PlaceBetController extends Controller
 {
@@ -34,8 +35,13 @@ class PlaceBetController extends Controller
             $before_balance = $request->getMember()->balanceFloat;
 
              // Cache event in Redis before processing
+            // Redis::set('event:' . $request->getMessageID(), json_encode($request->all()));
+            // Redis::get('event:' . $request->getMessageID(), json_encode($request->all()));
             Redis::set('event:' . $request->getMessageID(), json_encode($request->all()));
+            Log::info('Redis set event', ['messageID' => $request->getMessageID(), 'data' => $request->all()]);
 
+            $cachedData = Redis::get('event:' . $request->getMessageID());
+            Log::info('Redis get event', ['cachedData' => $cachedData]);
             $event = $this->createEvent($request);
 
             $seamless_transactions = $this->createWagerTransactions($validator->getRequestTransactions(), $event);
