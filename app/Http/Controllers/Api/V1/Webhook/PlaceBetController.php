@@ -33,6 +33,9 @@ class PlaceBetController extends Controller
 
             $before_balance = $request->getMember()->balanceFloat;
 
+             // Cache event in Redis before processing
+            Redis::set('event:' . $request->getMessageID(), json_encode($request->all()));
+
             $event = $this->createEvent($request);
 
             $seamless_transactions = $this->createWagerTransactions($validator->getRequestTransactions(), $event);
