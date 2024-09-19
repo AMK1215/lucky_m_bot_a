@@ -37,8 +37,11 @@ class PlaceBetController extends Controller
              // Cache event in Redis before processing
             // Redis::set('event:' . $request->getMessageID(), json_encode($request->all()));
             // Redis::get('event:' . $request->getMessageID(), json_encode($request->all()));
+            // Redis::set('event:' . $request->getMessageID(), json_encode($request->all()));
+            // Log::info('Redis set event', ['messageID' => $request->getMessageID(), 'data' => $request->all()]);
             Redis::set('event:' . $request->getMessageID(), json_encode($request->all()));
-            Log::info('Redis set event', ['messageID' => $request->getMessageID(), 'data' => $request->all()]);
+            Log::info('Event cached in Redis', ['key' => 'event:' . $request->getMessageID(), 'value' => json_encode($request->all())]);
+
 
             $cachedData = Redis::get('event:' . $request->getMessageID());
             Log::info('Redis get event', ['cachedData' => $cachedData]);
