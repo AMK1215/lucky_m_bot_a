@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1\Webhook\Traits;
 
 use App\Models\User;
 use App\Models\Wager;
+use App\Models\Admin\GameTypeProduct;
 use App\Enums\WagerStatus;
 use App\Models\Admin\Product;
 use App\Models\SeamlessEvent;
@@ -17,7 +18,7 @@ use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Log;
 use App\Http\Requests\Slot\SlotWebhookRequest;
 use App\Services\Slot\Dto\RequestTransaction;
-
+use Illuminate\Contracts\Support\Exception;
 trait RedisUseWebhook
 {
     public function createEvent(SlotWebhookRequest $request): SeamlessEvent
@@ -68,10 +69,26 @@ trait RedisUseWebhook
                 ]);
             }
 
-            $game_type = GameType::where('code', $requestTransaction->GameType)->firstOrFail();
-            $product = Product::where('code', $requestTransaction->ProductID)->firstOrFail();
+            $game_type = GameType::where('code', $requestTransaction->GameType)->first();
 
-            $game_type_product = $game_type->products()->where('product_id', $product->id)->firstOrFail();
+            if (!$game_type) {
+                throw new Exception("Game type not found for {$requestTransaction->GameType}");
+            }
+
+            $product = Product::where('code', $requestTransaction->ProductID)->first();
+
+            if (!$product) {
+                throw new Exception("Product not found for {$requestTransaction->ProductID}");
+            }
+
+            $game_type_product = GameTypeProduct::where('game_type_id', $game_type->id)
+                ->where('product_id', $product->id)
+                ->first();
+
+            if (!$game_type_product) {
+                throw new Exception("Game type product combination not found");
+            }
+
             $rate = $game_type_product->rate;
 
             $seamless_transactions[] = $event->transactions()->create([
