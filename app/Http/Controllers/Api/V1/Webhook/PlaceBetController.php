@@ -35,12 +35,14 @@ class PlaceBetController extends Controller
             $before_balance = $request->getMember()->balanceFloat;
 
              // Cache event in Redis before processing
-            // Redis::set('event:' . $request->getMessageID(), json_encode($request->all()));
-            // Redis::get('event:' . $request->getMessageID(), json_encode($request->all()));
-            // Redis::set('event:' . $request->getMessageID(), json_encode($request->all()));
-            // Log::info('Redis set event', ['messageID' => $request->getMessageID(), 'data' => $request->all()]);
-            Redis::set('event:' . $request->getMessageID(), json_encode($request->all()));
+            $ttl = 600; // Adjust TTL as per your requirements
+
+            // Store data in Redis with TTL
+            Redis::setex('event:' . $request->getMessageID(), $ttl, json_encode($request->all()));
+
+            // Log the caching event
             Log::info('Event cached in Redis', ['key' => 'event:' . $request->getMessageID(), 'value' => json_encode($request->all())]);
+
 
 
             $cachedData = Redis::get('event:' . $request->getMessageID());

@@ -19,13 +19,26 @@ use App\Http\Requests\Slot\SlotWebhookRequest;
 use Illuminate\Database\Eloquent\MassAssignmentException;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Support\Facades\Redis;
+use Illuminate\Support\Facades\Log;
 
 trait UseWebhook
 {
     public function createEvent(SlotWebhookRequest $request): SeamlessEvent
     {
-        // Cache event in Redis
-        Redis::set('event:' . $request->getMessageID(), json_encode($request->all()));
+        // // Cache event in Redis
+        // Redis::set('event:' . $request->getMessageID(), json_encode($request->all()));
+        // Set TTL in seconds (e.g., 600 seconds = 10 minutes)
+        $ttl = 600; // Adjust TTL as per your requirements
+
+        // Cache event in Redis with TTL
+        Redis::setex('event:' . $request->getMessageID(), $ttl, json_encode($request->all()));
+
+        // Log the caching event
+        Log::info('Event cached in Redis with TTL', [
+            'key' => 'event:' . $request->getMessageID(),
+            'value' => json_encode($request->all())
+        ]);
+
 
         // Store event in the database
         return SeamlessEvent::create([
